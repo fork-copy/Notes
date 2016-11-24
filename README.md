@@ -7,6 +7,7 @@
     - Hadoop
     - HBase
     - Spark
+    - Hive
   - Development
     - Java
     - Scala
