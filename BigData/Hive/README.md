@@ -19,6 +19,5 @@ Hive的SQL也可以通过用户自定义函数（User defined functions,UDFs),�
 
 Hive支持多种数据格式，如逗号和TAB为分隔符的文本文件（CSV/TSV)，Apache Parquet，Apache ORC，和其他格式.
 
-Hive不是为在线事务处理（online transaction processing,OLTP）而设计的
-Hive is not designed for online transaction processing (OLTP) workloads. It is best used for traditional data warehousing tasks.
-Hive is designed to maximize scalability (scale out with more machines added dynamically to the Hadoop cluster), performance, extensibility, fault-tolerance, and loose-coupling with its input formats.
+Hive不是为在线事务处理（online transaction processing,OLTP）而设计的。它非常适用于传统的数据仓库任务。Hive被设计为尽量可扩展，高性能，容错性，与数据输入格式低耦合。
+
