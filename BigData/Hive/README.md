@@ -21,3 +21,7 @@ Hive支持多种数据格式，如逗号和TAB为分隔符的文本文件（CSV/
 
 Hive不是为在线事务处理（online transaction processing,OLTP）而设计的。它非常适用于传统的数据仓库任务。Hive被设计为尽量可扩展，高性能，容错性，与数据输入格式低耦合。
 
+Hive组件包含HCatalog和WebHCat。
+- HCatalog是一个Hive组件。它是一个存储级别的表，对Hadoop来说，它允许用户使用不同的数据处理工具－包括Pig和MapReduce，来更加简单地读取和写数据。
+
+- WebHCat 提供了这样一些服务：我们可以使用一个HTTP接口（REST风格）来运行Hadoop MapReduce(或YARN)，Pig，Hive 作业或执行Hive元数据操作。
