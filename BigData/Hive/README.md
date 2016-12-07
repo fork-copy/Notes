@@ -1,5 +1,10 @@
 # 这里是Hive相关的学习笔记
 
+学习笔记包括以下内容：
+- DDL Opertaions 数据定义语言操作
+- DML Opertaions 数据操纵语言操作
+
+
 # Apache Hive
 
 [Apache Hive™](http://hive.apache.org/) 是一个数据仓库，区别于数据库，它帮助我们更好地读，写，管理和使用SQL语法查询大量存储在分布式存储系统中的数据集。
@@ -22,6 +27,6 @@ Hive支持多种数据格式，如逗号和TAB为分隔符的文本文件（CSV/
 Hive不是为在线事务处理（online transaction processing,OLTP）而设计的。它非常适用于传统的数据仓库任务。Hive被设计为尽量可扩展，高性能，容错性，与数据输入格式低耦合。
 
 Hive组件包含HCatalog和WebHCat。
-- HCatalog是一个Hive组件。它是一个存储级别的表，对Hadoop来说，它允许用户使用不同的数据处理工具－包括Pig和MapReduce，来更加简单地读取和写数据。
+- [HCatalog](https://cwiki.apache.org/confluence/display/Hive/HCatalog)是一个Hive组件。它是一个存储级别的表，对Hadoop来说，它允许用户使用不同的数据处理工具－包括Pig和MapReduce，来更加简单地读取和写数据。
 
-- WebHCat 提供了这样一些服务：我们可以使用一个HTTP接口（REST风格）来运行Hadoop MapReduce(或YARN)，Pig，Hive 作业或执行Hive元数据操作。
+- [WebHCat](https://cwiki.apache.org/confluence/display/Hive/WebHCat) 提供了这样一些服务：我们可以使用一个HTTP接口（REST风格）来运行Hadoop MapReduce(或YARN)，Pig，Hive 作业或执行Hive元数据操作。

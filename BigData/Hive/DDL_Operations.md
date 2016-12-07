@@ -1,7 +1,8 @@
 
+# 数据定义语言（DDL）操作
+
 # Hive的安装与配置
-请参考官方文档：
-https://cwiki.apache.org/confluence/display/Hive/GettingStarted
+请参考[官方文档](https://cwiki.apache.org/confluence/display/Hive/GettingStarted)
 
 如果你有安装Ambari，可以参考我之前的文章：
 [CentOS7使用本地库(Local Repository)安装Ambari-2.4.1和HDP-2.5.0](http://blog.csdn.net/strongyoung88/article/details/53149538)
@@ -10,7 +11,6 @@ https://cwiki.apache.org/confluence/display/Hive/GettingStarted
 也可以参考这篇：
 [Hive安装与配置](http://blog.csdn.net/strongyoung88/article/details/53007299)
 
-# 数据定义语言（DDL）操作
 
 创建数据库
 --
@@ -104,6 +104,9 @@ ds                  	string
 Time taken: 0.539 seconds, Fetched: 8 row(s)
 
 ```
+修改表
+--
+
 修改表的名字：
 
 ```
@@ -153,15 +156,20 @@ Time taken: 0.349 seconds, Fetched: 3 row(s)
 ```
 *replace columns 替换所有已存在的列，并且仅仅是修改表的schema，而不是数据本身。*
 
+删除表
+--
 删除表：
 
 ```
 hive> drop table pokes_2;
 ```
 
-元数据存储：
+元数据存储
+--
+Hive的元数据是存储在一个内置的Derby数据库中，它的磁盘位置由Hive配置的变量`javax.jdo.option.ConnectionURL`决定。默认情况下，这个位置是`./metastore_db`，（详见`conf/hive-default.xml`）。
 
-https://cwiki.apache.org/confluence/display/Hive/GettingStarted#GettingStarted-MetadataStore
+现在，在默认的配置中，这个元数据在某个时刻，只能被一个用户看到。
 
+元数据可以被其他任意由JPOX支持的数据库。使用的RDBMS的位置和类型由两个变量控制，分别是`javax.jdo.option.ConnectionURL`和`javax.jdo.option.ConnectionDriverName`。想查看更加详细关于支持的数据库，请参考JDO(或JPOX)文档。这些数据库的schema是定义在JDO元数据注解文件`package.jdo`中，这个文件在`src/contrib/hive/metastore/src/model`。
 
-The /etc/rc.d/rc.local script is executed by the init command at boot time or when changing runlevels. Adding commands to the bottom of this script is an easy way to perform necessary tasks like starting special services or initialize devices without writing complex initialization scripts in the /etc/rc.d/init.d/ directory and creating symbolic links.
+翻译自：https://cwiki.apache.org/confluence/display/Hive/GettingStarted#GettingStarted-DDLOperations
