@@ -107,3 +107,58 @@ INSERT INTO TABLE tablename PARTITION (partcol1[=val1], partcol2[=val2] ...) sel
  - 除非对分区提供了`if not exists`
 - `INSERT INTO`将会追加数据到表或分区中，保持已有数据。
 - 在相同的查询中，可以指定多个insert语句。
+- 每个查询语句的输出都被写到所选的表（或分区）中。
+- 输出格式和序列化类由表的元数据决定。
+- 从Hive 1.1.0起，关键词`TABLE`是可选。
+- 从Hive 1.2.0起，每个`INSERT INTO T`可以带上列的列表，就像这样`INSERT INTO T(z,x,c1)`。
+
+### 说明
+
+- 多表插入可以最小化数据扫描次数。Hive可以通过只扫描一次输入数据（应用不同的查询操作），然后插入到多个表中。
+
+
+## 将查询结果写入文件系统
+
+###　语法
+```
+Standard syntax:
+INSERT OVERWRITE [LOCAL] DIRECTORY directory1
+  [ROW FORMAT row_format] [STORED AS file_format] (Note: Only available starting with Hive 0.11.0)
+  SELECT ... FROM ...
+ 
+Hive extension (multiple inserts):
+FROM from_statement
+INSERT OVERWRITE [LOCAL] DIRECTORY directory1 select_statement1
+[INSERT OVERWRITE [LOCAL] DIRECTORY directory2 select_statement2] ...
+ 
+ 
+row_format
+  : DELIMITED [FIELDS TERMINATED BY char [ESCAPED BY char]] [COLLECTION ITEMS TERMINATED BY char]
+        [MAP KEYS TERMINATED BY char] [LINES TERMINATED BY char]
+        [NULL DEFINED AS char] (Note: Only available starting with Hive 0.13)
+```
+
+###　概要
+- 目录可以是一个全限定URI。如果没有指定schema，将使用hadoop配置变量`fs.default.name`指定的NameNode URI。
+
+- 如果使用了关键词`LOCAL`，Hive将写数据到本地文件系统的目录中。
+- 数据将以文本格式，列由`^A`分隔，行由换行分隔，存储到本地文件系统。如果有任意列不是原生类型，则这些列会被序列化成JSON格式。
+
+### 说明
+- `INSERT OVERWRITE`语句，对于本地目录，在同的查询里，表（或分区）可以一起使用。
+- `INSERT OVERWRITE`语句，对于HDFS文件系统目录，最非常适合从Hive中提取大量的数据。Hive可以在一个map-reduce作业中，并行地写数据到HDFS目录中。
+## 从SQL中，插入值到表中
+语句`INSERT...VALUES`可以直接从SQL插入数据到表中。这个功能是从Hive 0.14之后可以的。
+
+### 语法
+```
+Standard Syntax:
+INSERT INTO TABLE tablename [PARTITION (partcol1[=val1], partcol2[=val2] ...)] VALUES values_row [, values_row ...]
+ 
+Where values_row is:
+( value [, value ...] )
+where a value is either null or any valid SQL literal
+```
+
+### 说明
+- 
