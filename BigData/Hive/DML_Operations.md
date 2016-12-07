@@ -76,4 +76,34 @@ LOAD DATA [LOCAL] INPATH 'filepath' [OVERWRITE] INTO TABLE tablename [PARTITION 
 ### 说明
 - `filepath`不能包含子目录。
 - 如果关键词`LOCAL`没有给出，`filepath`必须指向与表位置相同的文件系统的文件。
-- Hive做了少量的检查，以确保文件能匹配表，然后被加载，目前，它检查表是否存储在一个顺序文件格式，被加载的文件是否也是顺序文件，反之亦然。
+- Hive做了少量的检查，以确保文件能匹配表，然后被加载，目前，它检查表是否存储在一个顺序文件格式，被加载的文件是否也是顺序文件，反之亦然
+
+## 将查询结果插入到Hive表
+使用`insert`关键词可以把查询结构插入到Hive表中。
+### 语法
+```
+Standard syntax:
+INSERT OVERWRITE TABLE tablename1 [PARTITION (partcol1=val1, partcol2=val2 ...) [IF NOT EXISTS]] select_statement1 FROM from_statement;
+INSERT INTO TABLE tablename1 [PARTITION (partcol1=val1, partcol2=val2 ...)] select_statement1 FROM from_statement;
+INSERT INTO TABLE tablename1 [PARTITION (partcol1=val1, partcol2=val2 ...)] (z,y) select_statement1 FROM from_statement;
+
+Hive extension (multiple inserts):
+FROM from_statement
+INSERT OVERWRITE TABLE tablename1 [PARTITION (partcol1=val1, partcol2=val2 ...) [IF NOT EXISTS]] select_statement1
+[INSERT OVERWRITE TABLE tablename2 [PARTITION ... [IF NOT EXISTS]] select_statement2]
+[INSERT INTO TABLE tablename2 [PARTITION ...] select_statement2] ...;
+FROM from_statement
+INSERT INTO TABLE tablename1 [PARTITION (partcol1=val1, partcol2=val2 ...)] select_statement1
+[INSERT INTO TABLE tablename2 [PARTITION ...] select_statement2]
+[INSERT OVERWRITE TABLE tablename2 [PARTITION ... [IF NOT EXISTS]] select_statement2] ...;
+
+Hive extension (dynamic partition inserts):
+INSERT OVERWRITE TABLE tablename PARTITION (partcol1[=val1], partcol2[=val2] ...) select_statement FROM from_statement;
+INSERT INTO TABLE tablename PARTITION (partcol1[=val1], partcol2[=val2] ...) select_statement FROM from_statement;
+```
+
+### 概要
+- `INSERT OVERWEITE`将会覆盖表或分区中的所有数据。
+ - 除非对分区提供了`if not exists`
+- `INSERT INTO`将会追加数据到表或分区中，保持已有数据。
+- 在相同的查询中，可以指定多个insert语句。
