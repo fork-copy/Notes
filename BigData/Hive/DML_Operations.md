@@ -138,7 +138,7 @@ row_format
         [NULL DEFINED AS char] (Note: Only available starting with Hive 0.13)
 ```
 
-###　概要
+### 概要
 - 目录可以是一个全限定URI。如果没有指定schema，将使用hadoop配置变量`fs.default.name`指定的NameNode URI。
 
 - 如果使用了关键词`LOCAL`，Hive将写数据到本地文件系统的目录中。
@@ -161,4 +161,52 @@ where a value is either null or any valid SQL literal
 ```
 
 ### 说明
-- 
+- `VALUES`语句后的每一行都会被插入表`tablename`中。
+- 表中的每一列的值都必须提供。
+- 动态分区同样支持`INSERT...SELECT`方式。
+- 如果插入的表支持ACID，在使用支持ACID的事务管理，这个操作将会自动成功地完成提交。
+- 排序表（在创建表的时候，使用了`SORTED BY`词）不支持插入，更新和删除操作。
+- Hive不支持复杂类型（array,map,struct ,union)，因此，它不能在`INSERT INTO ...VALUES`里使用。这意味着，用户不能使用`INSERT INTO...　VALUES`插入一个复杂数据类型列。
+
+### 例子
+```
+CREATE TABLE students (name VARCHAR(64), age INT, gpa DECIMAL(3, 2))
+  CLUSTERED BY (age) INTO 2 BUCKETS STORED AS ORC;
+ 
+INSERT INTO TABLE students
+  VALUES ('fred flintstone', 35, 1.28), ('barney rubble', 32, 2.32);
+ 
+ 
+CREATE TABLE pageviews (userid VARCHAR(64), link STRING, came_from STRING)
+  PARTITIONED BY (datestamp STRING) CLUSTERED BY (userid) INTO 256 BUCKETS STORED AS ORC;
+ 
+INSERT INTO TABLE pageviews PARTITION (datestamp = '2014-09-23')
+  VALUES ('jsmith', 'mail.com', 'sports.com'), ('jdoe', 'mail.com', null);
+ 
+INSERT INTO TABLE pageviews PARTITION (datestamp)
+  VALUES ('tjohnson', 'sports.com', 'finance.com', '2014-09-23'), ('tlee', 'finance.com', null, '2014-09-21');
+```
+
+## 更新
+### 语法
+```
+Standard Syntax:
+UPDATE tablename SET column = value [, column = value ...] [WHERE expression]
+```
+
+### 概要
+- 引用的列必须是将要更新表的一列。
+- 赋值必须是Hive在`select`中支持的表达式。因此，数学操作，UDFs，转换，字面值等是支持的。子查询是不支持的。
+- 只有匹配`where`的行才会被更新。
+- 分区列不能被更新。
+- 桶（bucket)列不能被更新。
+
+## 删除
+在Hive 0.14之后，支持删除
+### 语法
+```
+Standard Syntax:
+DELETE FROM tablename [WHERE expression]
+```
+### 概要
+- 只有匹配`where`的行才会被删除。
