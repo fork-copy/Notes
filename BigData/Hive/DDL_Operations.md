@@ -45,8 +45,34 @@ hive> drop database ecbdc;
 
 ```
 
-# 托管表和外部表
+# 创建表
+
+## 托管表和外部表
 默认情况下，Hive创建托管表，即文件，元数据和统计信息由Hive进程进行管理。托管表是存储在`hive.metastore.warehouse.dir`目录属性下，默认是在目录`/apps/hive/warehouse/databasename.db/tablename/`。默认位置可以在创建表的时候重写。如果托管表或分区被删除，相关的数据和元数据都被删除。
+
+当需要Hive来管理表的生命周期，或产生临时表的时候，使用托管表。
+
+一个外部表的元数据/schema是在描述在外部文件上的。外部表文件可以通过Hive之外的进程访问和管理。外部表可以访问的数据存储源有Azure Storage Volumes(ASV)和远程的HDFS。如果外部表的结构和分区改变了，需要使用命令`MSCK REPAIR table_name`来刷新元数据。
+
+使用外部表的时候，如果谁的已经存在或在远程位置上，那么，当表被删除时，文件仍然会补保留下来。
+
+可以使用命令`DESCRIBE FORMATTED table_name`来判断是托管表还是外部表，在表类型那里会显示`MANAGED_TABLE`或`EXTERNAL_TABLE`。
+
+## 存储格式
+Hive 支持内置和定制开发的文件格式。对于压缩的表存储详情请参阅[CompressedStorage](https://cwiki.apache.org/confluence/display/Hive/CompressedStorage)
+
+以下是Hive内置的一些格式：
+
+|存储格式|描述|
+|:-----|:-----|
+|存储为TEXTFILE|存储为平面文本文件，TEXTFILE is the default file format, unless the configuration parameter hive.default.fileformat has a different setting.<br/><br/>Use the DELIMITED clause to read delimited files. <br/><br/>Enable escaping for the delimiter characters by using the 'ESCAPED BY' clause (such as ESCAPED BY '\') .<br/><br/>Escaping is needed if you want to work with data that can contain these delimiter characters.<br/><br/>A custom NULL format can also be specified using the 'NULL DEFINED AS' clause (default is '\N').|
+|STORED AS SEQUENCEFILE|Stored as compressed Sequence File.|
+||Stored as ORC file format. Supports ACID Transactions & Cost-based Optimizer (CBO). Stores column-level metadata.|
+|STORED AS PARQUET|Stored as Parquet format for the Parquet columnar storage format in Hive 0.13.0 and later; Use ROW FORMAT SERDE ... STORED AS INPUTFORMAT ... OUTPUTFORMAT syntax ... in Hive 0.10, 0.11, or 0.12.|
+|STORED AS ORC|Stored as Avro format in Hive 0.14.0 and later (see Avro SerDe).|
+|STORED AS RCFILE|Stored as Record Columnar File format.|
+|STORED BY|Stored by a non-native table format. To create or link to a non-native table, for example a table backed by HBase or Druid or Accumulo. See StorageHandlers for more information on this option.|
+|INPUTFORMAT and OUTPUTFORMAT|in the file_format to specify the name of a corresponding InputFormat and OutputFormat class as a string literal.<br/><br/>For example, 'org.apache.hadoop.hive.contrib.fileformat.base64.Base64TextInputFormat'.<br/><br/> For LZO compression, the values to use are<br/><br/> 'INPUTFORMAT "com.hadoop.mapred.DeprecatedLzoTextInputFormat"<br/><br/> OUTPUTFORMAT "org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat"' <br/><br/>(see LZO Compression).|
 
 创建Hive表
 --
