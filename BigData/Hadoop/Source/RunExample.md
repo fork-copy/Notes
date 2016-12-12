@@ -173,6 +173,14 @@ Usage: hadoop [--config confdir] [COMMAND | CLASSNAME]
 
 Most commands print help when invoked w/o parameters.
 ```
+这里，我们用到了三个，分别是：`hadoop fs`，`hadoop jar`和`hadoop version`。
+
+`hadoop version`就是打印出hadoop的版本号.
+
+`hadoop fs`是运行一个通用的文件系统用户客户端，后面加上配置参数，实现对鹰爪系统的操作，比如`hadoop fs -mkdir dir`创建文件夹dir, `hadoop fs -rmdir dir`删除文件夹dir,更多的配置选项，可以在终端输入`hadoop fs`查看。
+
+`hadoop jar`是运行一个jar文件。后面跟上jar包。
+
 *注意*：在终端运行这个命令时，需要之前配置过环境变量，即需要将`hadoop`命令所在的bin目录配置到环境变量`PATH`里,或者直接把`hadoop`命令链接到当前`PATH`下。
 
 我安装的是HDP 2.5，在安装的时候，自动帮我配置到`/usr/bin/`下去了，通过以下可以看到，它把`hadoop-client/bin/`下的`hadoop`命令链接到了`/usr/bin/`。
