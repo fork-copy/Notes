@@ -62,6 +62,9 @@ This is a test file
 ```
 [yang@node3 hadoop-mapreduce]$ hadoop jar hadoop-mapreduce-examples.jar wordcount input/ output/
 ```
+命令解释：
+使用`hadoop jar`命令来运行一个叫做`hadoop-mapreduce-examples.jar`的jar文件，并执行这个jar文件里的wordcount类，输入目录为`input/`，输出目录为`output/`
+
 控制台输出如下：
 ```
 16/12/11 20:27:33 INFO impl.TimelineClientImpl: Timeline service address: http://node2:8188/ws/v1/timeline/
@@ -213,3 +216,26 @@ export HADOOP_OPTS="${HADOOP_OPTS} -Dhdp.version=${HDP_VERSION}"
 exec /usr/hdp/2.5.0.0-1245//hadoop/bin/hadoop.distro "$@"
 
 ```
+脚本很简单，除了export之外，就剩一个执行命令。
+
+`export`很好理解，就是导出这些变量，可以理解为声明这些变量，这些声明的变量在重启机器或换个会话之后，都会失效。
+
+对于"$@",就是传给当前脚本的参数列表，我们可以做个小测试，
+```
+[yang@node3 Shell]$ vi test_dollar_alt.sh
+[yang@node3 Shell]$ more test_dollar_alt.sh
+#!/bin/bash
+
+echo "$@"
+[yang@node3 Shell]$ chmod +x test_dollar_alt.sh
+```
+执行脚本：
+```
+[yang@node3 Shell]$ ./test_dollar_alt.sh a b c d
+a b c d
+
+```
+我们在执行脚本的时候，传入了4个参数，分别是a,b,c,d。因此，脚本执行后显示出了整个参数列表。
+
+
+想要了解更多，可[参考](http://www.cnblogs.com/kaituorensheng/p/4002697.html)
