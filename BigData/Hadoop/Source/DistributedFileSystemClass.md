@@ -80,6 +80,40 @@ Hadoop DFS用户应该获取一个`DistributedFileSystem`类的实例，这个�
 ```
 此方法实现的功能就是：使用给出的名字和权限，创建目录。
 
-`next`方法 
---
+接下来，我们看看到底是怎么创建目录的，我们跟踪方法`primitiveMkdir`的内部实现，此方法的源码如下：
+```
+  public boolean primitiveMkdir(String src, FsPermission absPermission, 
+    boolean createParent)
+    throws IOException {
+    checkOpen(); // 检查客户端是否正在运行，即检查dfsClient是否运行，也相当于检查DistributedFileSystem（DFS）是否初始化，因此在DFS初始化的时候，会初始化dfsClient。
+    if (absPermission == null) {
+      absPermission = 
+        FsPermission.getDefault().applyUMask(dfsClientConf.uMask);
+    } 
+
+    if(LOG.isDebugEnabled()) {
+      LOG.debug(src + ": masked=" + absPermission);
+    }
+    TraceScope scope = Trace.startSpan("mkdir", traceSampler);
+    try {
+      // 创建目录
+      return namenode.mkdirs(src, absPermission, createParent);
+    } catch(RemoteException re) {
+      throw re.unwrapRemoteException(AccessControlException.class,
+                                     InvalidPathException.class,
+                                     FileAlreadyExistsException.class,
+                                     FileNotFoundException.class,
+                                     ParentNotDirectoryException.class,
+                                     SafeModeException.class,
+                                     NSQuotaExceededException.class,
+                                     DSQuotaExceededException.class,
+                                     UnresolvedPathException.class,
+                                     SnapshotAccessControlException.class);
+    } finally {
+      scope.close();
+    }
+  }
+```
+可以看到，实际上创建目录的任务是由`namenode`完成的。
+
 
