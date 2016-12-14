@@ -106,3 +106,31 @@ DataNode以文件的形式存储HDFS数据在本地文件系统。DataNode没有
 --
 所有的HDFS通信协议，都是位于TCP/IP之上。客户端建立一个连接到NameNode机器上的一个可配置的TCP端口。它与NameNode使用Client Protocol通信。DataNode与NameNode使用DataNode Protocol通信。远程过程调用（Remote Procedure Call,RPC)是Client Protocol和DataNode Protocol的抽象。在设计上，NameNode从来不会初始化RPCs。而是，它仅仅响应来自DataNodes或客户端发来的RPC请求。
 
+健壮性
+--
+HDFS最主要的目标就是可靠地存储数据，三个最常见的错误类型是：NameNode失败，DataNode失败和网络割裂（network partitions).
+
+数据磁盘失败，心跳和重新拷贝（data disk failure , heartbeat and re-replication)
+--
+每个DataNode会周期性地发送一个“心跳”消息给NameNode。网络割裂会引起一些DataNode与NameNode失去连接。NameNode通过是否有“心跳”信息来探测这种情况。如果最近没有收到“心跳“，NameNode会标记此DataNode为不可用，也称为死的DataNode，然后不会发送一些IO请求给该DataNode。在死的DataNode上的任何数据，都是无法获取得到的。DataNode的死（或者说不可用）可能引起一些数据块的“副本因子”降到他们指定值的大小。NameNode会持续跟踪需要拷贝的数据块并在需要的时候进行拷贝。引起重新拷贝的原因有：一个DataNode变得不可用，一个副本不能用，DataNode的硬盘失败，或者一个文件的副本因子变大了。
+
+
+集群均衡
+--
+HDFS框架与数据均衡方案是兼容的。如果某个DataNode的空闲空间降到了特定的阈值，均衡方案可以自动地从一个DataNode移动数据到另外一个。对于一个指定的文件，如果突然变得要求很高，均衡方案可以动态地创建额外的副本，平衡集群中的其他数据。这些类型的数据均衡方案还没有实现。
+
+数据完整性
+--
+一个数据块，从DataNode获取，然后有可能收到的时候被损坏。这种情况可能是：存储设备的出错，网络出错，或软件的问题。HDFS的客户端软件实现了对HDFS文件内容检验的校验和。当一个客户端创建一个HDFS文件，它会计算每个文件数据块的校验和，并且会在相同的HDFS命名空间中，存储这些校验和在一个隐藏的单独文件中。当客户端检索文件内容时，它也会验证数据是否匹配存储在相应校验和文件中的校验和。如果不匹配，客户端将会从那个数据块的另外一个副本检索数据。
+
+元数据磁盘故障
+--
+FsImage和EditLog是HDFS的中央数据结构。这些文件的损坏会导致HDFS实例无法工作。对于这个原因，NameNode可以通过配置，以支持保留多个FsImage和EditLog的副本。任何对这两个文件的更新都会同步到这两个文件的副本。这种同步多个副本的方法可能会降低NameNode能够支持的命名空间事务每秒的速率。然而，这个降低是可以接受的，因为HDFS应用是天生的数据密集型，他们不是元数据密集型。当NameNode重起时，它会选择最新的一致的FsImage和EditLog文件来使用。
+
+对于增加错误的恢复能力，另外一种选择是：使用[NFS共享存储](http://hadoop.apache.org/docs/r2.7.3/hadoop-project-dist/hadoop-hdfs/HDFSHighAvailabilityWithNFS.html)或[分布式的编辑日志](http://hadoop.apache.org/docs/r2.7.3/hadoop-project-dist/hadoop-hdfs/HDFSHighAvailabilityWithQJM.html)（称之为Journal)以达到多个NameNode来实现高可用。推荐使用后面这种方式，即Journal。
+
+快照
+--
+[快照](http://hadoop.apache.org/docs/r2.7.3/hadoop-project-dist/hadoop-hdfs/HdfsSnapshots.html)支持存储在某个时刻数据的一个拷贝。这个快照的一种用法是：及时回滚一个失效的HDFS实例到之前正常的某个点。
+
+Snapshots support storing a copy of data at a particular instant of time. One usage of the snapshot feature may be to roll back a corrupted HDFS instance to a previously known good point in time.
