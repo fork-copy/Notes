@@ -1,4 +1,4 @@
-# 学习`FsShell`类
+# 学习`FsShell`类 － 创建目录
 
 类`FsShell`是使用命令`hadoop fs`时执行的类，它的功能就是：运行一个通用文件系统客户端，能够对文件系统进行相关操作。
 
@@ -47,7 +47,11 @@ public static int run(Tool tool, String[] args)
   return run(tool.getConf(), tool, args);
 }
 ```
-类`ToolRunner`的`run`方法主要做了两件事情，1）进行配置解析，即解析参数；2）执行命令。虽然最后执行的是`tool.run(toolArgs)`，但`FsShell`类实现了`Tool`接口，因此，这里执行的`run`方法，实际上就是在执行类`FsShell`里的`run`方法，此方法源码如下：
+类`ToolRunner`的`run`方法主要做了两件事情：
+
+1）进行配置解析，即解析参数；
+
+2）执行命令。虽然最后执行的是`tool.run(toolArgs)`，但`FsShell`类实现了`Tool`接口，因此，这里执行的`run`方法，实际上就是在执行类`FsShell`里的`run`方法，此方法源码如下：
 ```
 @Override
 public int run(String argv[]) throws Exception {
@@ -81,7 +85,11 @@ public int run(String argv[]) throws Exception {
   return exitCode;
 }
 ```
-在这个`run`方法中，也同样是做了两件事：1）通过`CommandFactory`工厂得到一个实例； 2）执行实例的`run`方法，并返回退出代码。
+在这个`run`方法中，也同样是做了两件事：
+
+1）通过`CommandFactory`工厂得到一个实例； 
+
+2）执行实例的`run`方法，并返回退出代码。
 
 `CommandFactory`工厂负责将命令转换成类，例如，当我们在终端输入的是`hadoop fs -mkdir dir`时，这个工厂会将命令`mkdir`转换成类`Mkdir`。不同的命令会转换成不同的类，其后，会调用文件系统的相应方法进行操作，根据不同的情况，使用的文件系统也可能不一样，这与配置文件相关，会实例化相应的文件系统。具体的操作是在文件系统代码中实现的。
 

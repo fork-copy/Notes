@@ -1,4 +1,4 @@
-# 学习类`DistributedFileSystem`
+# 学习类`DistributedFileSystem` －创建目录
 
 依然以命令`hadoop fs -mkdir dir`为例，整个命令的执行过程为：
 1. 首先执行`hadoop`脚本，更详细的过程可参考`RunExample.md`和`HadoopDistroCMD.md`文件。
