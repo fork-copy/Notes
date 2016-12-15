@@ -133,4 +133,17 @@ FsImage和EditLog是HDFS的中央数据结构。这些文件的损坏会导致HD
 --
 [快照](http://hadoop.apache.org/docs/r2.7.3/hadoop-project-dist/hadoop-hdfs/HdfsSnapshots.html)支持存储在某个时刻数据的一个拷贝。这个快照的一种用法是：及时回滚一个失效的HDFS实例到之前正常的某个点。
 
-Snapshots support storing a copy of data at a particular instant of time. One usage of the snapshot feature may be to roll back a corrupted HDFS instance to a previously known good point in time.
+数据组织
+--
+HDFS被设计为支持非常大的文件。与HDFS兼容的应用是处理那些海量的数据集的应用。这些应用只写一次数据，但是他们读取一次或多次，并且要求满足流式速度读取。HDFS支持一次写，多次读的文件。HDFS使用的经典的块大小是128MB。因此，一个HDFS文件被分割成128MB的数据块，如果可以的话，每个块将存储在不同的DataNode上。（因为在执行MR程序时，每个数据块会运行一个map任务，数据块分布在不同的DataNode，有助于提交程序的并发度）
+
+Staging
+--
+客户端请求创建一个文件，并不是马上到达NameNode的。实际上，起初HDFS客户端把文件数据缓存到本地缓冲区（buffer）。写申请是被重定向到这个本地缓冲区。当本地文件积累数据到一个数据块大小时（即一个chunk size），客户端会联系NameNode。NameNode插入文件名字到文件系统中，并且分配一个数据块给它。NameNode响应客户端请求，返回DataNode身份和目标数据块信息。然后，客户端会将本地缓冲区的数据写到指定的DataNode上。当一个文件被关闭时，也就是剩下的在本地缓冲区中没有被冲洗的数据全部被转移到DataNode的时候。然后，客户端告诉NameNode文件被关闭。在这个点，NameNode会提交文件创建操作持久化存储。如果在文件关闭之前，NameNode死了（进程挂了），则文件就丢了。
+
+经过慎重考虑，以上方式已经被采用。这些应用需要流式处理读取文件。如果一个客户端没有任何的客户端缓冲区就直接写一个远程的文件，网络速度和网络拥塞会严重影响吞吐。这个方式史无前例。早期的分布式文件系统，例如AFS，使用客户端缓存来改善性能。通过降低POSIX的要求，以达到提高数据上传的性能。
+
+管道复制
+--
+当客户端写数据到HDFS文件，正如前面部分描述，它的数据首先写到本地缓冲区。假设HDFS文件的副本因子是3.当本地缓冲区积累到一个数据块大小，客户端从NameNode检索到一个DataNode列表。这个列表包含了将要存储那个数据块副本的DataNode。然后，客户端冲洗（flush)数据块到第一个DataNode。第一个DataNode开始接收小部分数据，这些数据写到本地目录，并且传输给DataNode列表中的第二个DataNode。第二个DataNode开始接收数据块的每个小部分数据，写到本地目录，并且冲洗这些数据到第三个DataNode。最后，第三个DataNode写数据到本地目录。因此，一个DataNode可以从管道中的前一个DataNode接收数据，同时，也可以转交数据给管道中的下一个DataNode。因此，数据是从一个DataNode流向下一个DataNode。
+
