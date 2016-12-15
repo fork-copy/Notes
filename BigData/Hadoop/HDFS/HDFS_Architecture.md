@@ -1,38 +1,38 @@
-- HDFS Architecture
-  - Introduction
-  - Assumptions and Goals
-    - Hardware Failure
-    - Streaming Data Access
-    - Large Data Sets
-    - Simple Coherency Model
-    - “Moving Computation is Cheaper than Moving Data”
-    - Portability Across Heterogeneous Hardware and Software Platforms
+- HDFS 架构
+  - 引言
+  - 假设与目标
+    - 硬件出错
+    - 流式数据访问
+    - 大型数据集
+    - 简单一致性
+    - 移动计算比移动数据便宜
+    - 可移值性
   - NameNode and DataNodes
-  - The File System Namespace
-  - Data Replication
-    - Replica Placement: The First Baby Steps
-    - Replica Selection
-    - Safemode
-  - The Persistence of File System Metadata
-  - The Communication Protocols
-  - Robustness
-    - Data Disk Failure, Heartbeats and Re-Replication
-    - Cluster Rebalancing
-    - Data Integrity
-    - Metadata Disk Failure
-    - Snapshots
-  - Data Organization
-    - Data Blocks
+  - 文件系统命名空间
+  - 数据复本
+    - 副本的放置
+    - 副本的选择
+    - 安全模式
+  - 文件系统元数据的持久化
+  - 通信协议
+  - 健壮性
+    - 数据磁盘失败，心跳和重新拷贝
+    - 集群均衡
+    - 数据完整性
+    - 元数据磁盘故障
+    - 快照
+  - 数据组织
+    - 数据块
     - Staging
-    - Replication Pipelining
+    - 管道复制
   - Accessibility
     - FS Shell
     - DFSAdmin
-    - Browser Interface
-  - Space Reclamation
-    - File Deletes and Undeletes
-    - Decrease Replication Factor
-  - References
+    - 浏览器接口
+  - 空间回收
+    - 文件删除与摊销删除
+    - 降低副本因子
+  - 引用
 
 
 ## 引言
@@ -49,8 +49,8 @@ HDFS降低了一些POSIX要求，以允许对文件系统数据的流式访问�
 ### 流式数据访问
   HDFS需要流式处理应用数据，设计的初衷更偏向于批处理，而非用户交互使用，注重高吞吐，而非低延迟。
 
-### 大量数据集
-  HDFS支持海量数据集
+### 大型数据集
+  HDFS支持大型数据集
 
 ### 简单一致性
   一次写入，多次读取，更加高效
