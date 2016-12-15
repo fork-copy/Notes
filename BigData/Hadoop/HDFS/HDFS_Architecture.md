@@ -223,3 +223,5 @@ drwxr-xr-x   - yang hdfs          0 2016-12-15 10:34 .Trash/Current/user/yang/de
 Hadoop [JavaDoc API](http://hadoop.apache.org/docs/current/api/)
 
 HDFS source code: http://hadoop.apache.org/version_control.html
+
+以上内容翻译自：http://hadoop.apache.org/docs/r2.7.3/hadoop-project-dist/hadoop-hdfs/HdfsDesign.html
