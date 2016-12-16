@@ -210,3 +210,42 @@ DELETE FROM tablename [WHERE expression]
 ```
 ### 概要
 - 只有匹配`where`的行才会被删除。
+
+# 简单示例
+
+## MovieLens 用户评分
+
+首先，创建一个表，字段之前使用`\t`分隔：
+```
+CREATE TABLE u_data (
+  userid INT,
+  movieid INT,
+  rating INT,
+  unixtime STRING)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '\t'
+STORED AS TEXTFILE;
+```
+然后，从GoupLens datasets下载数据集：
+```
+wget http://files.grouplens.org/datasets/movielens/ml-100k.zip
+```
+或者：
+```
+curl --remote-name http://files.grouplens.org/datasets/movielens/ml-100k.zip
+```
+解压文件：
+```
+unzip ml-100k.zip
+```
+然后把数据`u.data`加载到刚才创建的表：
+```
+LOAD DATA LOCAL INPATH '<path>/u.data'
+OVERWRITE INTO TABLE u_data;
+```
+查询表`u_data`有多少行：
+```
+SELECT COUNT(*) FROM u_data;
+```
+
+
