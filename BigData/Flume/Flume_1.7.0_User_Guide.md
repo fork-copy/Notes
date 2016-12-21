@@ -593,3 +593,92 @@ a1.sources.r1.port = 4141
 ```
 
 #### Exec Source
+Exec source是启动的时候运行一个Unix命令，预期进程可以持续地产生数据到标准输出（stderr是简单的忽略，除非属性logStdErr是设置为true）。如果进程由于任意原因退出，source也会退出，将不再产生数据。这也意味着像`cat [named pipe]`或`tail -F [file]`的配置将会产生要想的结果，然而`date`将也可能得不到想要的结果－前两个命令产生数据流，而后面这个将产生单个event并且退出。
+
+以下属性粗体为必需属性：
+
+
+*警告*：如果发生故障，ExecSource和其他异步源无法保证传递event到channel。在这种情况，数据将会丢失。例如，作为最常见的特征之一是像`tail -F [file]`的使用情况，即一个应用把日志文件写到磁盘，并Flume来从尾部读取file，每行作为一个event进行发送。尽管这是可以的，但有一个明显的问题，如果channel填満了，并且Flume不能发送event的时候，这个时候会发生什么？因为某种原因，Flume没有方法来指示正在写日志的应用，它需要保留日志还是event不能被发送。如果这没什么意义，你只需要知道：当使用一个单向的异步接口（例如execsource），你的应用从来不能保障数据能收到。作为这个警告的扩展（很清楚） － 当使用这个source，event传输没有绝对的0保障。想要更强的可靠性保障，考虑使用spooling Directory source或通过SDK直接集成到Flume。
+
+agent a1示例：
+```
+a1.sources = r1
+a1.channels = c1
+a1.sources.r1.type = exec
+a1.sources.r1.command = tail -F /var/log/secure
+a1.sources.r1.channels = c1
+```
+配置'shell'是用于通过一个命令shell（例如Bash或Powershell）来触发'command'，‘command‘被解析成一个参数来shell中执行。这就允许'command'使用shell的特征，例如通配符，管道，back ticks，循环，条件等。如果没有配置'shell'，'command'会直接触发。‘shell'常见的值：`‘/bin/sh -c‘`,`/bin/ksh -c`,`cmd/c`,`powershell -Command`等。
+```
+a1.sources.tailsource-1.type = exec
+a1.sources.tailsource-1.shell = /bin/bash -c
+a1.sources.tailsource-1.command = for i in /path/*.txt; do cat $i; done
+```
+
+#### JMS Source
+JMS source从JMS目的地读取信息，例如一个队列或主题。现有的JMS应用应该可以同任意的JMS提供者工作，但是只测试过ActiveMQ。JMS source提供可配置的`batch size`,`message selector`,`user/pass`,和到flume event的信息转换。注意：供应商提供的JMS的jars应该包含在Flume的类目录下 － 可以在命令行设置，也可以在flume-env.sh中设置变量`FLUME_CLASSPATH`。
+
+必需的属性为粗体：
+
+##### Converter (转换器)
+JMS允许插件式的转换器，尽管它像默认的转换器，为了某些功能而工作。默认的转换器可以转换字节，文本和对象信息到FlumeEvent。在所有情况下，信息中的属性被添加作为header传输到FlumeEvent。
+
+字节信息：
+字节信息被拷贝到FlumeEvent的body。不能转换数据超过2GB的单条信息。
+
+文本信息：
+文本信息被转换成字节数组，并拷贝到FlumeEvent的body。默认的转换器默认使用UTF－8，但这是可以配置的。
+
+对象信息：
+对象被写到包装在ObjectOutputStream里的ByteArrayOutputStream，产生的数据被拷贝到FlumeEvent的body。
+
+agent a1示例：
+```
+a1.sources = r1
+a1.channels = c1
+a1.sources.r1.type = jms
+a1.sources.r1.channels = c1
+a1.sources.r1.initialContextFactory = org.apache.activemq.jndi.ActiveMQInitialContextFactory
+a1.sources.r1.connectionFactory = GenericConnectionFactory
+a1.sources.r1.providerURL = tcp://mqserver:61616
+a1.sources.r1.destinationName = BUSINESS_DATA
+a1.sources.r1.destinationType = QUEUE
+```
+
+#### Spooling Directory Source
+这个source让你通过放置文件在被注入到磁盘上的“spooling"目录来获取数据。这个source将监视指定的目录下的文件，当新文件出现，source会解析新文件成events。event解析的逻辑是可以支持插件的。当文件被完全地读入到channel之后，文件会被重命名，以指示完成（或可选的删除）。
+
+不像Exec source，这个source是可靠的，甚至是Flume重启或被杀掉，都将不会丢失数据。作为这个可靠性的交换，在这个spooling目录下的文件必须是不可变的，且文件命名唯一。Flume会设法探测这个问题条件，如果有冲突，将会出错：
+1. 如果一个文件被放置在spooling目录之后，还往此文件中写数据，Flume将会打印错误信息到它的日志文件并停止进程。
+2. 如果在后续的时间，文件名被重新使用，Flume也会打印错误信息到它的日志文件并停止进程。
+
+为了避免上述问题，当日志文件被移动到spooling目录时，添加一个唯一的标识（例如一个时间戳）到日志文件名字可能是有用的。
+
+尽管这个source有可靠性的保证，但如果下流有错误发生，仍然会引起event重复。这个一致性保障由其他的Flume组件提供。
+
+
+agent agent-1示例：
+```
+a1.channels = ch-1
+a1.sources = src-1
+
+a1.sources.src-1.type = spooldir
+a1.sources.src-1.channels = ch-1
+a1.sources.src-1.spoolDir = /var/log/apache/flumeSpool
+a1.sources.src-1.fileHeader = true
+```
+
+##### Event Deserializers（反序列化Event的东东）
+以下是Flume自带的event Deserializers
+
+###### LINE
+对于文本输入的每行，这个deserializer产生一个event。
+|属性名|默认值|描述|
+|:--|:--|:--|
+|deserializer.maxLineLength|2048|包含在单个event中的最大字符数。如果一行超过了这个长度，它将截断，剩下的字符将会出现在下一event中|
+|deserializer.outputCharset|UTF-8|解码event到channel所使用的字符集|
+
+###### AVRO
+这个deserializer能够读取一个Avro容器文件，文件中的每个Avro记录产生一个event。每个event有个header注释，指示所使用的schema。event的body是二进制的Avro记录数据，没有包括schema或剩下的容器文件元素。
+
+
