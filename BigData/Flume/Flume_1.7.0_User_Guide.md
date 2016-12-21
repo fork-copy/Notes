@@ -165,4 +165,11 @@ Flume srouce消费从外部源（如web server）传递过来的events。外部�
 Flume允许用户来建立多跳的流，即event经过多个agent之后才到达最终目的。它也可以“扇入”和“扇出”流（即像扇子一样的流，例如，扇入可以是多个agent，流向同一个agent。扇出也类似，一个agent的event流向多个agent），前面路由和容灾路由。
 
 ### 可靠性
+events是阶段性的停留在每个agent的channel中。然后events被传递到下一个agent或最终库（如HDFS）。只有在events被存储在下一个agent的channel中或到达了最终目的，events才会在当前channel中删除。这就是在单跳信息传递中，Flume是如何提供端到端可靠的流。
+
+Flume使用事务型方式来确保可靠的events传输。source和sink都被压缩在一个由channel提供的事务中。这确保events集合可以可靠地从流中的一个点传递到另一个点。这“多跳流“的情况下，来自前一跳的sink和来自下一跳的source，它们都是以事务的方式运行，以此确保数据能够安全的存储在下一跳的channel中。
+
+### 可恢复性
+events暂存在channel中，channel可以从出错中恢复。Flume提供了一个持久的文件channel，这个文件channel是本地文件系统的一个备份。也有memory channel，它简单地存储events在一个内存队列中，它是很快的，但是，当agent进程死了的时候，在memory channel中的任何event都会丢失。
+
 
