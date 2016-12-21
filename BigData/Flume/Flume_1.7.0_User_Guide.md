@@ -549,3 +549,47 @@ agent_foo.sources.avro-AppSrv-source1.selector.default = mem-channel-1
 
 注意：如果一个header没有指定要求的channel，event将会写到默认的channel，且会尝试写到那个header的optional的channel。如果没有指定要求的channel，指定optional channel将会引起event被写到默认的channel。如果没有指定默认的channel，也没有指定要求的channel，选择器将尝试写event到optional channel。在这种情况下，任何的失败都只会简单的忽略。
 
+### Flume Sources
+#### Avro source
+监听Avro端口，从外部的Avro client流接收events。当与另一个Flume agent（前一跳）内置的Avro sink成对时，它能创建分层的集合拓扑结构。粗写的为必填属性。
+
+agent a1例子：
+```
+a1.sources = r1
+a1.channels = c1
+a1.sources.r1.type = avro
+a1.sources.r1.channels = c1
+a1.sources.r1.bind = 0.0.0.0
+a1.sources.r1.port = 4141
+```
+
+ipFilterRules例子
+
+ipFilterRules定义了N个由逗号分隔的ipFilters，模式规则必须是这种格式：
+```
+<’allow’ or ‘deny’>:<’ip’ or ‘name’ for computer name>:<pattern> or allow/deny:ip/name:pattern
+```
+
+example: `ipFilterRules=allow:ip:127.*,allow:name:localhost,deny:ip:*`
+
+例如：
+`allow:name:localhost,deny:ip:`
+这将允许名为`localhost`的客户端，任意ip形式的主机都将被拒绝。
+
+`deny:name:localhost,allow:ip:`
+这将拒绝名为`localhost`的客户端，任意ip形式的主机都允许。
+
+#### Thrift source
+监听Thrift端口，接收来自外部的Thrift client流。当与另一个Flume agent（前一跳）的内置的Thrift sink成对时，它能创建分层的集合拓扑结构。通过启用kerberos授权，Thrift source可以可以配置成在安全模式下启动。属性`agent-principal`和`agent-keytab`是用于Thrift source授权给kerberos KDC的属性。以下属性粗写的为必配项。
+
+agent a1例子：
+```
+a1.sources = r1
+a1.channels = c1
+a1.sources.r1.type = thrift
+a1.sources.r1.channels = c1
+a1.sources.r1.bind = 0.0.0.0
+a1.sources.r1.port = 4141
+```
+
+#### Exec Source
