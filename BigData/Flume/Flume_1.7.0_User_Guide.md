@@ -159,3 +159,10 @@ Apache Flume是Apache软件基金会的顶级项目。
 Flume event被定义为一个数据流单元，它有一个字节负载和一个可选的字符串属性。一个Flume agent是一个JVM进程，agent中的组件将事件流（event flow)从一个外部源传到下一个目的地。
 ![](http://flume.apache.org/_images/UserGuide_image00.png)
 
+Flume srouce消费从外部源（如web server）传递过来的events。外部源以目标Flume source能识别的格式发送events给Flume。例如，Avro Flume source可以用于接收来自Avro客户端或其他流中的Flume agent的Avro sink发送的Avro events。与此类似的流是，使用Thrift FLume Source接收来自Thrift sink或Thrift Rpc 客户端或来自Flume thrift protocol产生的任意语言写的Thrift 客户端。当Flume source接收到一个event，它存储event到一个或多个channel。这个channel被动存储event，并保留此event，直到它被一个Flume sink消费。例如－file channel，它是存储在本地文件系统。sink把event从channel移除，并把它放到一个外部的库，如HDFS（经过Flume HDFS sink)，或把此event转发给流中的下一个Flume agent的Flume source。agent中的source和sink异步地进行event staged。
+
+### 复杂流
+Flume允许用户来建立多跳的流，即event经过多个agent之后才到达最终目的。它也可以“扇入”和“扇出”流（即像扇子一样的流，例如，扇入可以是多个agent，流向同一个agent。扇出也类似，一个agent的event流向多个agent），前面路由和容灾路由。
+
+### 可靠性
+
