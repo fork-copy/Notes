@@ -681,4 +681,80 @@ a1.sources.src-1.fileHeader = true
 ###### AVRO
 这个deserializer能够读取一个Avro容器文件，文件中的每个Avro记录产生一个event。每个event有个header注释，指示所使用的schema。event的body是二进制的Avro记录数据，没有包括schema或剩下的容器文件元素。
 
+如果你的spooling directory source一定要重试把一个event放到一个channel（例如channel已满），然后它将会重置并且从最近的Avro容器文件同步点重试。在这样一个错误的场景下，要降低这个潜在的event重复，在你的Avro输入文件中要更加频繁地写同步标记。
+|属性名|默认值|描述|
+|:--|:--|:--|
+|deserializer.schemaType|HASH|schema是如何呈现的。默认情况下，当值为`HASH`时，Avro schema是哈希的，哈希是存储在每个event，每个event的header"flume.avro.schema.hash"。如果值为`LITERAL`，用JSON编码的schema是存储在每个event的header"flume.avro.schema.literal"上。树比`HASH`模式，使用`LITERAL`效率更低。|
+
+###### BlobDeserializer
+这个deserializer的每个event读取二进制大对象（BLOB），通常是每个文件为一个二进制大对象。例如一个PDF或JPG文件。注意：这种方式对于非常大的对象不合适，因为整个BLOB是存储在内存中的。
+|属性名|默认值|描述|
+|:--|:--|:--|
+|deserializer|－|这个类的全限定名：`org.apache.flume.sink.solr.morphline.BlobDeserializer$Builder`|
+|deserializer.maxBlobLength|100000000|对于给出的请求，允许读取和缓存的最大字节数|
+
+#### Taildir Source
+*注意*:这个source是作为预览特征提供的。它不能在windows上工作。
+
+监听指定的文件，对于每个文件，一旦探测到有新行加入，接近实时地tail这个文件。如果新行正在写，这个source会等到写完成再重试读这他们。
+
+这个source是可靠的，且不会丢失数据，甚至是循环tail文件时也不会。它会周期性地写每个文件的“最后读位置”到一个JSON格式的位置文件。如果由于某种原因，Flume停止或宕机了，从已存的位置文件中，它能重启，继续tail文件。
+
+在另外一种使用情况，使用位置文件，这个source也可以从文件的任意位置进行tail.当在指定的目录下没有位置文件，它将默认从每个文件的第一行进行tail。
+
+文件会按照他们的修改时间被消耗。最老修改时间的文件将会被首先消耗。
+
+这个source不能对要被tail的文件进行重命名，删除，或任何修改。目前是这个source不支持tail二进制文件。它按行读取文本文件。
+
+
+agent a1示例：
+```
+a1.sources = r1
+a1.channels = c1
+a1.sources.r1.type = TAILDIR
+a1.sources.r1.channels = c1
+a1.sources.r1.positionFile = /var/log/flume/taildir_position.json
+a1.sources.r1.filegroups = f1 f2
+a1.sources.r1.filegroups.f1 = /var/log/test1/example.log
+a1.sources.r1.headers.f1.headerKey1 = value1
+a1.sources.r1.filegroups.f2 = /var/log/test2/.*log.*
+a1.sources.r1.headers.f2.headerKey1 = value2
+a1.sources.r1.headers.f2.headerKey2 = value2-2
+a1.sources.r1.fileHeader = true
+```
+
+#### Twitter 1% firehose Source(试验)
+*警告*：这个source
+
+#### Kafka Source
+
+#### NetCat Source
+
+#### Sequence Generator Source
+
+#### Syslog Sources
+
+##### Syslog TCP Source
+##### Multiport Syslog TCP
+##### Syslog UDP Source
+
+#### HTTP Source
+##### JSONHandler 
+##### BlobHandler
+
+#### Stress Source
+#### Legacy Sources
+##### Avro Legacy Source
+##### Thrift Legacy Source
+
+#### Custom Source
+#### Scribe Source
+
+### FLume Sinks
+#### HDFS Sink
+#### Hive Sink
+#### Logger Sink
+#### Avro Sink
+
+
 
