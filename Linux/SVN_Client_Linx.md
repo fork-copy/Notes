@@ -6,6 +6,8 @@
 
 其实，SVN的用法和Git的用户类似，用过git的用户都知道，在使用git的时候，也是需要配置用户名和密码的。
 
+以下是在系统CentOS 7下，使用SVN的配置过程：
+
 ## 配置username
 
 在家目录下的`.subversion`文件夹下，找到servers文件，并编辑此文件：
