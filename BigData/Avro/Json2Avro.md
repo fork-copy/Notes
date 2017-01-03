@@ -1,4 +1,5 @@
 
+# 使用json2avro转换
 
 ## install cmake
 
@@ -66,4 +67,10 @@ collect2: error: ld returned 1 exit status
 解决方法：缺少库liblzma导致，所以要安装这个库
 ```
 [root@master lib]# yum install xz-devel.x86_64 
+```
+
+# 使用avro-tools转换
+但在先下载`avro-tools`jar包，以及提供要转换json文件的schema：
+```
+[yang@master Data]$ java -jar ../Soft/avro-tools-1.8.1.jar fromjson EnZSP2.json   --schema-file enzsp.avsc > bb.avro
 ```
