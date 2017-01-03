@@ -36,3 +36,67 @@ SELECT Str_To_Date( Concat(@yr,'-',@wk,'-',If(@day=7,0,@day) ), '%Y-%U-%w' ) AS 
 - `str_to-date`是将字符串转换成日期； 
 - `concat`是连接字符串；
 - `IF(expr1,expr2,expr3)`如果表达式1为true（expr1 <> 0 且 expr1 <> NULL），则返回表达式2，否则返回表达式3.
+
+### 下个月的第一天日期
+
+下个月的第一天日期:
+```
+concat(left(curdate() + interval 1 month, 8), '-01'); 
+```
+前一个月的第一天日期:
+```
+concat(left(curdate() - interval 1 month, 8), '-01'); 
+```
+*解释*
+- `left`是取字符串最左边的指定个字符，与`right`类似，但方向相反。
+- `curdate`是当前日期
+- `interval`是间隔多少时间，可以间隔年，月，日，如下：
+```
+mysql> select curdate();
++------------+
+| curdate()  |
++------------+
+| 2017-01-03 |
++------------+
+
+# 下一个月
+mysql> select curdate()+interval 1 month;
++----------------------------+
+| curdate()+interval 1 month |
++----------------------------+
+| 2017-02-03                 |
++----------------------------+
+
+# 上一个月
+mysql> select curdate()-interval 1 month;
++----------------------------+
+| curdate()-interval 1 month |
++----------------------------+
+| 2016-12-03                 |
++----------------------------+
+
+# 上两个月
+mysql> mysql> select curdate()-interval 2 month;
++----------------------------+
+| curdate()-interval 2 month |
++----------------------------+
+| 2016-11-03                 |
++----------------------------+
+
+# 前两年
+mysql> select curdate()-interval 2 year;
++---------------------------+
+| curdate()-interval 2 year |
++---------------------------+
+| 2015-01-03                |
++---------------------------+
+
+# 前两天
+mysql> select curdate()-interval 2 day;
++--------------------------+
+| curdate()-interval 2 day |
++--------------------------+
+| 2017-01-01               |
++--------------------------+
+
+```
