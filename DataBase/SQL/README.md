@@ -15,8 +15,24 @@ Year(Curdate()) - Year(@dob) - ( Right(Curdate(),5) < Right(@dob,5) )
 Round((((Year(now()) - Year(@dob)))*12 + (((Month(now()) - Month(@dob)))))/12, 2) 
 ```
 *解释*:
-`To_Days`是把日期转换成天数； 
-`From_Days`是把天数转换成日期；
-`Date_format`是把日期转换成指定的格式，这里`%Y`是取日期的年份。
-`Right`是取最右边的指定个数的字符串。
-`Round`是四舍五入。
+- `To_Days`是把日期转换成天数； 
+- `From_Days`是把天数转换成日期；
+- `Date_format`是把日期转换成指定的格式，这里`%Y`是取日期的年份。
+- `Right`是取最右边的指定个数的字符串。
+- `Round`是四舍五入。
+
+### 根据年份，第几周，星期几，来计算日期
+
+```
+SET @yr=2012, @wk=26, @day=0; 
+SELECT Str_To_Date( Concat(@yr,'-',@wk,'-',If(@day=7,0,@day) ), '%Y-%U-%w' ) AS Date; 
++------------+ 
+| Date       | 
++------------+ 
+| 2012-06-24 | 
++------------+ 
+```
+*解释*
+- `str_to-date`是将字符串转换成日期； 
+- `concat`是连接字符串；
+- `
