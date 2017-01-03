@@ -35,4 +35,4 @@ SELECT Str_To_Date( Concat(@yr,'-',@wk,'-',If(@day=7,0,@day) ), '%Y-%U-%w' ) AS 
 *解释*
 - `str_to-date`是将字符串转换成日期； 
 - `concat`是连接字符串；
-- `
+- `IF(expr1,expr2,expr3)`如果表达式1为true（expr1 <> 0 且 expr1 <> NULL），则返回表达式2，否则返回表达式3.
