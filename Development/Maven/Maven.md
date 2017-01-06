@@ -151,7 +151,42 @@ mvn package
 ```
 
 就像官方网站说的，" this is pretty simple! "
+<hr>
+然而，当在运行操作hdfs的jar包时，我出现了以下问题：
+```
+Exception in thread "main" java.io.IOException: No FileSystem for scheme: hdfs
+        at org.apache.hadoop.fs.FileSystem.getFileSystemClass(FileSystem.java:2660)
+        at org.apache.hadoop.fs.FileSystem.createFileSystem(FileSystem.java:2667)
+        at org.apache.hadoop.fs.FileSystem.access$200(FileSystem.java:94)
+        at org.apache.hadoop.fs.FileSystem$Cache.getInternal(FileSystem.java:2703)
+        at org.apache.hadoop.fs.FileSystem$Cache.get(FileSystem.java:2685)
+        at org.apache.hadoop.fs.FileSystem.get(FileSystem.java:373)
+        at sentry.magic.fs.Dfs.<init>(Dfs.java:20)
+        at sentry.magic.fs.CheckFlumeIsCompleted.<init>(CheckFlumeIsCompleted.java:26)
+        at Main.main(Main.java:26)
+```
+好在有位仁兄[2]也遇到了这个问题，从而使得问题解决。他的解决方法如下：
+```
+    FileSystem dfs = null;
+    Configuration conf = new Configuration();
+
+    public Dfs(URI uri) throws IOException {
+
+        // 必须有下面这一句
+        conf.set("fs.hdfs.impl","org.apache.hadoop.hdfs.DistributedFileSystem");
+        // 必须有上面那一句
+
+        dfs = FileSystem.get(uri,conf);
+    }
+```
+除了他之种方法之外，我也自己摸索出了一种方法，经过实践，也是可行的，我的方法如下：
+找到打包好的jar包，然后使用归档管理器打开这个jar包，即“open with archive manager",找到`META-INFO/services`目录，再找到这个目录下的`org.apache.hadoop.fs.FileSystem`文件，编辑这个文件，在文件末尾加上一行：
+```
+org.apache.hadoop.hdfs.DistributedFileSystem
+```
+但是，这么修改jar的方法，不太合适，因为每生成一次，需要修改一次，所以，建议暂时使用前面那种解决方法。
 
 参考文献：
 
 [1] https://maven.apache.org/plugins/maven-assembly-plugin/usage.html
+[2] http://www.cnblogs.com/justinzhang/p/4983673.html
