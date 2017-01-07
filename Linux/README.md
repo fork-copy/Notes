@@ -15,6 +15,7 @@
   ps -ax | grep flume | wc -l
   ```
 - 去除字符串前面的空格
+
   ```
   echo " abc" | sed -e 's/^[[:space:]]*//'
   ```
