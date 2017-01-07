@@ -1,9 +1,11 @@
 # Linux 学习笔记
 
 - 找到含有flume的进程
+
   ```
   ps -ax | grep flume
   ```
+  
   找到不含有flume的进程
   ```
   ps -ax | grep -v flume
