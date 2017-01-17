@@ -60,3 +60,6 @@ Hadoop MapReduce是一个软件框架，它使得编写在普通硬件的大集�
 
 通常，计算节点和存储节点是相同的，也就是说，MapReduce框架和Hadoop分布式文件系统（请查阅HDFS框架指南）是运行在相同的节点集合之上。这种配置使得框架可以高效地对有数据的节点上的任务进行调度，导致整个集群具有非常高的聚合宽带。
 
+// TODO
+
+本文翻译自：http://hadoop.apache.org/docs/r2.7.3/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html
