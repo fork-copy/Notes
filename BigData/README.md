@@ -6,6 +6,7 @@
 - Hive
 - Spark
 
+将打包好的jar包，上传到HDFS，以YARN方式运行
 ```
 # Run on a YARN cluster
 export HADOOP_CONF_DIR=XXX
