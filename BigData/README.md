@@ -1,11 +1,13 @@
 # 这里是大数据相关的学习笔记，包括以下内容：
 - Ambari
+- Avro
 - Flume
 - Hadoop
 - HBase
 - Hive
 - Spark
 
+将打包好的jar包，上传到HDFS，以YARN方式运行
 ```
 # Run on a YARN cluster
 export HADOOP_CONF_DIR=XXX
