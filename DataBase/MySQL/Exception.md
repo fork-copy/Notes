@@ -16,5 +16,8 @@ mysql> load data local infile 'part-r-00000-994a6102-2976-4546-95d3-1ec62ada5a46
 ```
 mysql> load data local infile 'part-r-00000-994a6102-2976-4546-95d3-1ec62ada5a46.csv' into table xxnd fields terminated by ',' (`SchoolID`, `GradeLength`, `SubjectID`,`QTypeID`,`QTypeName`,   `DifficultyValue`,`UpdateTime`);
 ```
+*注意*
+
+字段是用\`，而不是用'，不是用单引号。
 
 数据导入（`load data`）语法官方网页：http://dev.mysql.com/doc/refman/5.7/en/load-data.html
