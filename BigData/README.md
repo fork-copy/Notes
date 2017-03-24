@@ -24,3 +24,14 @@ export HADOOP_CONF_DIR=XXX
 ```
 ./bin/spark-submit --class com.lancoo.ecbdc.Main --master yarn --deploy-mode cluster --executor-memory 10G --num-executors 20 ./EduCloud-Backend-assembly-2.0.jar 1000
 ```
+
+# 计算pi 
+```
+ /usr/hdp/2.5.0.0-1245/spark2/bin/spark-submit --class org.apache.spark.examples.SparkPi     --master yarn     --deploy-mode cluster     --driver-memory 4g     --executor-memory 2g     --executor-cores 1      /usr/hdp/2.5.0.0-1245/spark2/examples/jars/spark-examples_2.11-2.0.0.2.5.0.0-1245.jar  10 
+
+```
+
+# 查看yarn logs
+```
+yarn logs -applicationId application_1486170743656_0030
+```
