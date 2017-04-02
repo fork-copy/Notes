@@ -1,3 +1,7 @@
 # Hadoop 源代码学习
-1. 运行Hadoop程序
-2. 了解`FsShell`类
+
+1. 编译源码
+2. 操作HDFS
+
+2.1. 从HDFS读取文件
+2.2. 写数据到HDFS之上
