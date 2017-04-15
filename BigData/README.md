@@ -35,3 +35,6 @@ export HADOOP_CONF_DIR=XXX
 ```
 yarn logs -applicationId application_1486170743656_0030
 ```
+
+# 参数 EMR
+--class com.lancoo.ecbdc.Main --master yarn --deploy-mode cluster --executor-memory 3G   oss://ecbdcbuket/data/EduCloud-Backend-assembly-2.0.jar
