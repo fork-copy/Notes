@@ -29,12 +29,15 @@
   最后使用`kill`命令加`-s`参数强制杀掉进程。
 
 - 配置无密码登录
+
 Step 1: Create public and private keys using ssh-key-gen on local-host
 
 `$ ssh-keygen`
+
 Step 2: Copy the public key to remote-host using ssh-copy-id
 
 `$ ssh-copy-id user@remote-host`
+
 Step 3: Check login to remote-host without entering the password
 
 `$ ssh user@remote-host`
